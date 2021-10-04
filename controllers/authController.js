@@ -74,10 +74,22 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   if (loggedUser.changedPasswordAfter(decoded.iat)) {
     return next(
-      new AppError('User changed password recently. Please log in again', 401)
+      new AppError("User changed password recently. Please log in again", 401)
     );
   }
 
-  req.user=loggedUser
+  req.user = loggedUser;
   next();
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  if (!(await user.checkPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your password is incorrect", 401));
+  }
+  user.password=req.body.password
+  user.passwordConfirm=req.body.passwordConfirm;
+  await user.save()
+
+  createAndSendToken(user, 200, res);
 });
