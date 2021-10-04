@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt=require('bcryptjs')
+const bcrypt = require("bcryptjs");
+const validator = require('validator');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -11,37 +12,44 @@ const userSchema = mongoose.Schema({
     type: String,
     unique: true,
     required: [true, "Please provide your email"],
-    lowerCase: true
+    lowerCase: true,
+    validator: [validator.isEmail, "Please provide a valid email"]
   },
-  photo:{
-    type:String,
+  photo: {
+    type: String
   },
   password: {
-    type:String,
+    type: String,
     required: [true, "Please provide a password"],
     minLength: 8,
-    select:false
+    select: false
   },
-  passwordConfirm:{
-    type:String,
-    required:[true, 'Please provide a password']
+  passwordConfirm: {
+    type: String,
+    required: [true, "Please provide a password"],
+    validate: {
+      validator: function(el) {
+        return this.password === el;
+      },
+      message: "Passwords are not the same"
+    }
   }
 });
 
 // Hashing the password before saving and deleting passwordConfirm
-userSchema.pre('save', async function(next){
-    if(!this.isModified('password')){
-      next()
-    }
-    this.password=await bcrypt.hash(this.password,12)
-    this.passwordConfirm=undefined;
-    next()
-})
+userSchema.pre("save", async function(next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
+});
 
-userSchema.methods.checkPassword=async function(candidatePassword, hashedRealPassword){
-  return await bcrypt.compare(candidatePassword, hashedRealPassword)
-}
+userSchema.methods.checkPassword = async function(candidatePassword, hashedRealPassword) {
+  return await bcrypt.compare(candidatePassword, hashedRealPassword);
+};
 
-const User=mongoose.model('User',userSchema)
+const User = mongoose.model("User", userSchema);
 
-module.exports=User
+module.exports = User;
