@@ -8,6 +8,7 @@ const hpp = require("hpp");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
+const userRouter=require("./routes/userRoutes")
 
 const app = express();
 app.use(helmet());
@@ -28,6 +29,7 @@ app.use(hpp({ whitelist:[""] }));
 app.use(express.static(`${__dirname}/public`));
 
 // Routes will be there
+app.use('/api/users',userRouter)
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
