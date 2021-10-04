@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const validator = require('validator');
+const validator = require("validator");
 
 const userSchema = mongoose.Schema({
   name: {
@@ -33,7 +33,8 @@ const userSchema = mongoose.Schema({
       },
       message: "Passwords are not the same"
     }
-  }
+  },
+  passwordChangedAt: Date
 });
 
 // Hashing the password before saving and deleting passwordConfirm
@@ -46,8 +47,23 @@ userSchema.pre("save", async function(next) {
   next();
 });
 
+userSchema.pre("save", function(next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 userSchema.methods.checkPassword = async function(candidatePassword, hashedRealPassword) {
   return await bcrypt.compare(candidatePassword, hashedRealPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function(JWTTimeStamp) {
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = +(this.passwordChangedAt.getTime() / 1000);
+    return JWTTimeStamp < changedTimeStamp;
+  }
+  return false;
 };
 
 const User = mongoose.model("User", userSchema);
