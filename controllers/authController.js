@@ -42,13 +42,16 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password"), 401);
   }
-//   Give access and send token to the user there
+  createAndSendToken(user, 200, res);
 });
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm } = req.body;
+  console.log("i am here");
   const newUser = await User.create({
-    name, email, password, passwordConfirm
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm
   });
-//  Give access and send token to the user there
+  createAndSendToken(newUser, 201, res);
 });

@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser=require('body-parser')
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const helmet = require('helmet');
@@ -22,14 +23,19 @@ const limiter = rateLimit({
   message: "Too many requests from this IP. Please try again in an hour"
 });
 app.use("/api", limiter);
+app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp({ whitelist:[""] }));
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
-
+app.use(bodyParser.json())
 // Routes will be there
-app.use('/api/users',userRouter)
+app.use('/',(req,res,next)=>{
+  console.log(req.url)
+  next()
+})
+app.use('/api/users', userRouter)
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
