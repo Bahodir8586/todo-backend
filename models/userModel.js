@@ -27,6 +27,20 @@ const userSchema = mongoose.Schema({
   }
 });
 
+// Hashing the password before saving and deleting passwordConfirm
+userSchema.pre('save', async function(next){
+    if(!this.isModified('password')){
+      next()
+    }
+    this.password=await bcrypt.hash(this.password,12)
+    this.passwordConfirm=undefined;
+    next()
+})
+
+userSchema.methods.checkPassword=async function(candidatePassword, hashedRealPassword){
+  return await bcrypt.compare(candidatePassword, hashedRealPassword)
+}
+
 const User=mongoose.model('User',userSchema)
 
 module.exports=User
