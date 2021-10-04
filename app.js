@@ -1,6 +1,7 @@
 const express=require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const xss = require('xss-clean');
 
 
 const AppError = require('./utils/appError');
@@ -11,13 +12,15 @@ const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-// Limiting the rate of the requests
+// Middlewares against attacks
 const limiter = rateLimit({
   max: 30,
   windowMs: 60 * 1000,
   message: 'Too many requests from this IP. Please try again in an hour'
 });
 app.use('/api', limiter);
+
+app.use(xss());
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
 
