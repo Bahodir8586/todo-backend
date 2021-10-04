@@ -64,10 +64,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) {
     return next(new AppError("You are not logged in. Please login first"), 401);
   }
-  ;
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  const loggedUser = await User.findOne(decoded.id);
+  const loggedUser = await User.findById(decoded.id);
   if (!loggedUser) {
     return next(new AppError("The user belonging to this token does no longer exists"));
   }
