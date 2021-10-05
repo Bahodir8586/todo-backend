@@ -31,10 +31,6 @@ app.use(hpp({ whitelist:[""] }));
 app.use(express.static(`${__dirname}/public`));
 app.use(bodyParser.json())
 // Routes will be there
-app.use('/',(req,res,next)=>{
-  console.log(req.url)
-  next()
-})
 app.use('/api/users', userRouter)
 
 app.all("*", (req, res, next) => {

@@ -26,7 +26,7 @@ const userSchema = mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [true, "Please provide a password"],
+    required: [true, "Please provide a password confirmation"],
     validate: {
       validator: function(el) {
         return this.password === el;
@@ -48,8 +48,9 @@ userSchema.pre("save", async function(next) {
 });
 
 userSchema.pre("save", function(next) {
-  if (!this.isModified("password") || this.isNew) return next();
-
+  if (!this.isModified("password") || this.isNew) {
+    return next();
+  }
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });

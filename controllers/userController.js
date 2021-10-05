@@ -17,10 +17,12 @@ exports.update = catchAsync(async (req, res, next) => {
     return next(new AppError("You can not update the password with this route", 400));
   }
   const filteredBody = filterObj(req.body, "name", "email");
+  console.log(filteredBody)
   const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true
   });
+  console.log(user)
   await user.save();
   res.status(200).json({
     status: "success",
