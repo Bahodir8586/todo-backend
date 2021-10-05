@@ -29,3 +29,11 @@ exports.update = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.delete = catchAsync(async (req, res, next) => {
+  await User.findByIdAndDelete(req.user.id);
+  res.status(204).json({
+    status: "success",
+    data: null
+  });
+});
