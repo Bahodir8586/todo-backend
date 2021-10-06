@@ -9,6 +9,7 @@ router.use("/", authController.protect);
 router.route("/")
   .get(taskController.getTasks)
   .post(taskController.createTask)
+  .delete(taskController.deleteAllTasks)
 
 router.route('/:id')
   .get(taskController.getTask)

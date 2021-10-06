@@ -80,3 +80,10 @@ exports.getTask = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.deleteAllTasks = catchAsync(async (req, res, next) => {
+  await User.findOneAndUpdate(req.user.id, { $set: { tasks: [] } }, { multi: true });
+  res.status(204).json({
+    status: "success",
+    data: null
+  });
+});
