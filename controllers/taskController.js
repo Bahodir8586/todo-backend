@@ -13,3 +13,6 @@ exports.updateTask=catchAsync(async(req,res,next)=>{
 exports.deleteTask=catchAsync(async(req,res,next)=>{
 
 })
+exports.getTask=catchAsync(async(req,res,next)=>{
+
+})
