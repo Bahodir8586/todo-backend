@@ -34,7 +34,20 @@ const userSchema = mongoose.Schema({
       message: "Passwords are not the same"
     }
   },
-  passwordChangedAt: Date
+  passwordChangedAt: Date,
+  tasks: [
+    {
+      name: {
+        type: String,
+        required: [true, "Task name can not be empty"]
+      },
+      status: {
+        type: String,
+        default: "todo",
+        enum:['todo','finished']
+      }
+    }
+  ]
 });
 
 // Hashing the password before saving and deleting passwordConfirm

@@ -8,9 +8,9 @@ const taskSchema = mongoose.Schema({
   status: {
     type: String,
     default: "todo",
-    enum:['todo','finished']
+    enum: ["todo", "finished"]
   }
 });
 
-const Task = mongoose.model(taskSchema);
+const Task = mongoose.model("Tour", taskSchema);
 module.exports = Task;
