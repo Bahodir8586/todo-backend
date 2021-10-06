@@ -44,7 +44,7 @@ const userSchema = mongoose.Schema({
       status: {
         type: String,
         default: "todo",
-        enum:['todo','finished']
+        enum: ["todo", "finished"]
       }
     }
   ]
@@ -65,6 +65,13 @@ userSchema.pre("save", function(next) {
     return next();
   }
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre("aggregate", function(next) {
+  this.pipeline().unshift({ $project: { __v: 0, password: 0 } });
+
+  console.log(this.pipeline());
   next();
 });
 
