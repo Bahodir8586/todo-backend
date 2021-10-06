@@ -15,6 +15,7 @@ exports.getTasks = catchAsync(async (req, res, next) => {
     }
   });
 });
+
 exports.createTask = catchAsync(async (req, res, next) => {
   const newTask = req.body;
   await User.findByIdAndUpdate(req.user.id, { $push: { "tasks": newTask } }, {
@@ -29,6 +30,7 @@ exports.createTask = catchAsync(async (req, res, next) => {
     }
   });
 });
+
 exports.updateTask = catchAsync(async (req, res, next) => {
   const updatedTasks = await User.findOneAndUpdate(
     { "_id": req.user.id },
@@ -40,7 +42,7 @@ exports.updateTask = catchAsync(async (req, res, next) => {
     {
       arrayFilters: [{ "el._id": req.params.id }]
     }
-  ).select("-_id -name -email -__v")
+  ).select("-_id -name -email -__v");
 
   res.status(200).json({
     status: "success",
@@ -48,8 +50,8 @@ exports.updateTask = catchAsync(async (req, res, next) => {
       data: updatedTasks
     }
   });
-})
-;
+});
+
 exports.deleteTask = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { $pull: { "tasks": { _id: req.params.id } } });
   res.status(204).json({
@@ -58,7 +60,27 @@ exports.deleteTask = catchAsync(async (req, res, next) => {
   });
 
 });
-exports.getTask = catchAsync(async (req, res, next) => {
 
+exports.getTask = catchAsync(async (req, res, next) => {
+  const task = await User.findById(req.user.id,
+    {
+      tasks: {
+        $elemMatch: {
+          _id: {
+            $eq: req.params.id
+          }
+        }
+      }
+    });
+  if (!task.tasks.length) {
+    return next(new AppError("There is no task with that ID", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      task
+    }
+  });
 });
-;
+
