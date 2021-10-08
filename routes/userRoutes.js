@@ -9,11 +9,13 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.get("/logout", authController.logout);
 
-router.patch("/updatePassword", authController.protect, authController.updatePassword);
+router.use("/", authController.protect);
+
+router.patch("/updatePassword", authController.updatePassword);
 router.route("/")
-  .get(authController.protect, userController.get)
-  .patch(authController.protect, userController.update)
-  .delete(authController.protect, userController.delete);
+  .get(userController.get)
+  .patch(userController.update)
+  .delete(userController.delete);
 
 
 module.exports = router;
