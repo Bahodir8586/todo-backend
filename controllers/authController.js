@@ -4,6 +4,7 @@ const { promisify } = require("util");
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const Email = require("../utils/email");
 
 const signToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -104,9 +105,23 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
   // 3. Send it via email
   try {
+    const passwordResetUrl=`${req.protocol}://${req.get(
+      'host'
+    )}/api/users/resetPassword/${token}`
+    await new Email(user, passwordResetUrl).sendPasswordReset()
 
+    res.status(200).json({
+      status: 'Success',
+      message: 'Token sent to email'
+    });
   } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
 
+    return next(
+      new AppError('There was an error sending the email. Try again later', 500)
+    );
   }
 });
 
