@@ -95,24 +95,23 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  // 1. Get user based on posted email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError("No user found with that id", 404));
   }
-  // 2. Generate random token
+
   const token = await user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
-  // 3. Send it via email
+
   try {
-    const passwordResetUrl=`${req.protocol}://${req.get(
-      'host'
-    )}/api/users/resetPassword/${token}`
-    await new Email(user, passwordResetUrl).sendPasswordReset()
+    const passwordResetUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/api/users/resetPassword/${token}`;
+    await new Email(user, passwordResetUrl).sendPasswordReset();
 
     res.status(200).json({
-      status: 'Success',
-      message: 'Token sent to email'
+      status: "Success",
+      message: "Token sent to email"
     });
   } catch (error) {
     user.passwordResetToken = undefined;
@@ -120,7 +119,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     return next(
-      new AppError('There was an error sending the email. Try again later', 500)
+      new AppError("There was an error sending the email. Try again later", 500)
     );
   }
 });
