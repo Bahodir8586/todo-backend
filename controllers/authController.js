@@ -100,7 +100,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     return next(new AppError("No user found with that id", 404));
   }
   // 2. Generate random token
+  const token = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
   // 3. Send it via email
+  try {
+
+  } catch (error) {
+
+  }
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
