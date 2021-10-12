@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const { promisify } = require("util");
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
@@ -85,13 +86,30 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   if (!(await user.checkPassword(req.body.passwordCurrent, user.password))) {
     return next(new AppError("Your password is incorrect", 401));
   }
-  user.password=req.body.password
-  user.passwordConfirm=req.body.passwordConfirm;
-  await user.save()
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
 
   createAndSendToken(user, 200, res);
 });
 
-exports.logout=catchAsync(async (req,res,next)=>{
-  res.clearCookie('jwt').send();
-})
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1. Get user based on posted email
+  const user = await User.findOne({ email: req.params.email });
+  if (!user) {
+    return next(new AppError("No user found with that id", 404));
+  }
+  // 2. Generate random token
+  // 3. Send it via email
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //  1) Get user based on the token
+  //  2) If token has not expired and there is a user, set new Password
+  //  3) Update changedPasswordAt property at current user
+  //  4) Log the user in
+});
+
+exports.logout = catchAsync(async (req, res, next) => {
+  res.clearCookie("jwt").send();
+});
