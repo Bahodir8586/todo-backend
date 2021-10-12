@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
+const crypto = require("crypto");
 
 const userSchema = mongoose.Schema({
   name: {
@@ -35,6 +36,8 @@ const userSchema = mongoose.Schema({
     }
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
   tasks: [
     {
       name: {
