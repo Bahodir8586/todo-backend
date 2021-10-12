@@ -79,6 +79,13 @@ userSchema.methods.checkPassword = async function(candidatePassword, hashedRealP
   return await bcrypt.compare(candidatePassword, hashedRealPassword);
 };
 
+userSchema.methods.createPasswordResetToken = async function() {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  this.passwordResetExpires = Date.now() + 2 * 60 * 60 * 1000;
+  return resetToken;
+};
+
 userSchema.methods.changedPasswordAfter = function(JWTTimeStamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = +(this.passwordChangedAt.getTime() / 1000);
