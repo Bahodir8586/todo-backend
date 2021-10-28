@@ -1,6 +1,6 @@
-const catchAsync = require("./../utils/catchAsync");
-const AppError = require("./../utils/appError");
-const User = require("./../models/userModel");
+const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
+const User = require('./../models/userModel');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -14,18 +14,20 @@ const filterObj = (obj, ...allowedFields) => {
 
 exports.update = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
-    return next(new AppError("You can not update the password with this route", 400));
+    return next(
+      new AppError('You can not update the password with this route', 400)
+    );
   }
-  const filteredBody = filterObj(req.body, "name", "email");
-  console.log(filteredBody)
+  const filteredBody = filterObj(req.body, 'name', 'email');
+  console.log(filteredBody);
   const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true
   });
-  console.log(user)
+  console.log(user);
   await user.save();
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user
     }
@@ -35,7 +37,7 @@ exports.update = catchAsync(async (req, res, next) => {
 exports.delete = catchAsync(async (req, res, next) => {
   await User.findByIdAndDelete(req.user.id);
   res.status(204).json({
-    status: "success",
+    status: 'success',
     data: null
   });
 });
@@ -43,7 +45,7 @@ exports.delete = catchAsync(async (req, res, next) => {
 exports.get = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user
     }
